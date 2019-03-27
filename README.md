@@ -31,6 +31,6 @@ $ cd spark-setup
 $ ./connectToCluster.sh <clustername> # e.g., clusterup20150000
 ```
 
-The 
+The Jupyter instance _should_ now be running on http://localhost:8123
 
 **Note**: if this fails, check if the instance is running on [the Google Cloud Platform Web App](https://console.cloud.google.com/compute/instances)
