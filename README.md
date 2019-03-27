@@ -3,15 +3,16 @@ Big Data &amp; Cloud Computing
 
 [Project description](https://www.dcc.fc.up.pt/~edrdo/aulas/bdcc/projects/01/)
 
-## Deadline
+## General Info 
+### Deadline
 Apr. 7, 2019
 
-## Delivery
+### Delivery
 Send an email to edrdo@dcc.fc.up.pt with the following attachments:
 - The Jupyter notebook (or the Python export of it, if you prefer);
 - A text document in Portuguese or English summarising the work you could accomplish (in terms of functionality and data sets) and the difficulties you had, with at most 3 pages (excluding the cover page).
 
-## Evaluation
+### Evaluation
 Your code will be evaluated in terms of:
 
  - correctness in functional terms;
@@ -20,3 +21,16 @@ Your code will be evaluated in terms of:
  - Your report should be short and succint (3 pages max.), but readable!
 
 The completion of challenges proposed at the end of this document may be worth up to 15 % of the final grade.
+
+## Development 
+
+### Starting the "cluster"
+
+```shell
+$ cd spark-setup
+$ ./connectToCluster.sh <clustername> # e.g., clusterup20150000
+```
+
+The 
+
+**Note**: if this fails, check if the instance is running on [the Google Cloud Platform Web App](https://console.cloud.google.com/compute/instances)
