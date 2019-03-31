@@ -23,7 +23,7 @@ Your code will be evaluated in terms of:
 The completion of challenges proposed at the end of this document may be worth up to 15 % of the final grade.
 
 ## Development 
-
+ - Some expected results which can be used for testing can be found [here](https://www.dcc.fc.up.pt/~edrdo/aulas/bdcc/projects/01/Tests.html)
 ### Requirements
 
 - [Google Cloud SDK](https://cloud.google.com/sdk/) - specifically the `gcloud` and `gsutil` utilities
