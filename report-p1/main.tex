@@ -1,0 +1,175 @@
+\documentclass[10pt,twocolumn]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{todonotes}
+
+\newcommand{\numpy}{{\tt numpy}}    % tt font for numpy
+\topmargin -1in
+\textheight 9in
+\oddsidemargin -.25in
+\evensidemargin -.25in
+\textwidth 7in
+
+
+%%%%%%%%%%%%%%%%%%%%%%%% HEADER ABOVE
+
+\begin{document}
+
+\author{António Almeida, UP201505836 \\Miguel Sozinho Ramalho, UP201403027}
+\date{April $7^{th}$, 2019}
+\title{Big Data and Cloud Computing : Project 1}
+\twocolumn[
+  \begin{@twocolumnfalse}
+    \maketitle
+    \tableofcontents
+  \end{@twocolumnfalse}
+]
+
+\newpage
+\pagebreak
+\clearpage
+
+
+\section{Introduction}
+% Contextualizar e descrever brevemente as técnicas em estudo
+% Falar do dataset usado
+In the context of the Big Data and Cloud Computing (BDCC) course, a study of techniques used for handling large amounts of data with typical languages and frameworks was developed. These tools include the Python\footnote{https://www.python.org/} programming language, Jupyter Notebooks\footnote{https://jupyter.org/}, Pyspark\footnote{https://spark.apache.org/docs/2.2.1/api/python/pyspark.html}, Google Cloud Platform\footnote{https://cloud.google.com/gcp} and some of its functionality such as virtual machines and cloud buckets. The ultimate goal being the understanding of what works for machine learning applications, which approaches scale well enough as the amount of data increases and how all of this can be deployed through cloud computing tools. 
+
+Particularly, this project consists on a study of a benchmark dataset, MovieLens\footnote{https://grouplens.org/datasets/movielens/}, for recommendation tasks using metrics such as \textit{Term Frequency–Inverse Document Frequency}\footnote{https://en.wikipedia.org/wiki/Tf\%E2\%80\%93idf} (tf-idf) and the \textit{Jaccard Index}\footnote{https://en.wikipedia.org/wiki/Jaccard_index} for similarity calculations. Section \ref{sec:mandatory} includes details about the implementation of mandatory functions and Section \ref{sec:extended}, on the other hand, includes details on the implementation of optional functions that represent an extent to the previous functions and have a higher degree of freedom on how they should be implemented.
+
+\section{Dataset}
+From the Movielens Dataset, the following tables were used:
+\begin{itemize}
+    \itemsep0em
+    \item \textbf{Movies}, with the columns \textbf{movieId, title}
+    \item \textbf{Tags}, with the columns: \textbf{movieId, userId, tag}
+    \item \textbf{Ratings}, with the columns: \textbf{movieId, userId, rating}
+\end{itemize}
+
+\section{Functions to implement}\label{sec:mandatory}
+The final notebook contains a top-down structure of dependencies, as is recommended for such notebooks, and is organised in a similar fashion to this report. In the subsections below, each of the mandatory functions is described in terms of implementation decisions and not functionality, as that information is already present in the project requirements document\footnote{http://www.dcc.fc.up.pt/~edrdo/aulas/bdcc/projects/01/}. 
+% Falar sobre o notebook em geral
+
+\subsection{tfidfTags}\label{sec:tfidfTags}
+\begin{enumerate}
+    \itemsep0em
+    \item Group the tags dataframe by (tag, movieId) and count the number of users of the aggregation, naming it as $f$, in a new dataframe - $df\_f$
+    \item Group the result from the previous step by movieId so as to obtain the maximum value of $f$ for each movie - $f\_max$ - in a new dataframe - $df\_f\_max$
+    \item Call an auxiliary function - $get\_idf$ - that calculates the inverse document frequency values for a given dataset 
+    \item Join the $df\_f$ dataframe with the $df\_f\_max$ dataframe on movieId, so as to know the $f\_max$ value for each tag. At this stage the document frequency is also calculated and added to the result. Finally, a join with the $df\_idf$ dataframe is performed so as to get all the information together.
+    \item Lastly, the previous dataframe is returned with a new column which results from applying the tf-idf formula and multiplying the TF value with the IDF value in other columns.
+\end{enumerate}
+
+\subsection{recommendByTag}
+\begin{enumerate}
+    \itemsep0em
+    \item Filter the TFIDF\_tags dataframe by the target tag, i.e. $singleTag$
+    \item Filter the resulting dataframe by removing entries with $f\_max$ inferior to $min\_fmax$, to exclude movies tagged sparsely, in a new dataframe - $df\_tag$
+    \item Join $df\_tag$ with the $movies$ dataframe on movieId, so as to obtain the title of the movie each tag is associated with
+    \item Order the results by ($TF\_IDF$, $title$), by descending and asscending order, respectively
+    \item The previous dataframe contains unnecessary columns, so only the relevant ones are selected, i.e., $movieId$, $title$, and $TF\_IDF$
+    \item Lastly, the results are limited by $numberOfResults$ and then returned
+\end{enumerate}
+
+\subsection{recommendByTags}\label{sec:recommendByTags}
+\begin{enumerate}
+    \itemsep0em
+    \item Call the provided function $createTagListDF$ on $searchTags$, which creates a dataframe with one entry per target tag, in a new variable - $df\_search\_tag$
+    \item Filter $TFIDF\_tags$ by removing entries with $f\_max$ inferior to $min\_fmax$, to exclude movies tagged sparsely
+    \item Join the resulting dataframe with $df\_search\_tags$ on tag, so as to obtain entries that match the target tags, in a new dataframe - $df\_tags$
+    \item Group $df\_tags$ by $movieId$ and calculate the sum of $TF\_IDF$ of the aggregation, naming it as $SUM\_TF\_IDF$
+    \item Join the result from the previous step with movies on movieId to get the movie titles
+    \item Order the resulting dataframe by ($SUM\_TF\_IDF$, $title$), by descending and ascending order, respectively
+    \item Reorder the columns of the resulting dataframe to match the examples, by selecting them in the correct order, i.e. ($moviedId$, $title$, $SUM\_TF\_IDF$)
+    \item Finally, the results are limited by $numberOfResults$ and then returned 
+\end{enumerate}
+
+\subsection{jiMovieSimilarity}
+\begin{enumerate}
+    \itemsep0em
+    \item Filter the ratings of movies for greater than or equal to 4.0, the minimum value considered for a rating to be a \textit{like}, $df\_likes$
+    \item Group the liked ratings by $movieId$ and aggregate a set of the userIds of the users who rated the movie; these sets counted per movie and used to filter those movies that have less than the $minRatings$ parameter and the set and movieId columns are renamed to $u1$ and $m1$
+    \item Duplicate the previous dataframe by changing the column names of the copy to $u2$ and $m2$
+    \item Lastly, a cross product is generated between both dataframes guaranteeing that $m1 < m2$ to avoid duplicates; the intersection and union of both user sets are taken and their size used to calculate the Jaccard Index. (This functionality has been isolated in the $jaccard\_index$ function)
+    \item Lastly, the results proper columns are returned
+\end{enumerate}
+
+\subsection{recommendBySimilarity}
+\begin{enumerate}
+    \itemsep0em
+    \item The JI dataframe is used twice to search the target movie on both the $m1$ and $m2$ columns
+    \item These two datasets are appended
+    \item Simply use the new dataset to join it with the movies dataframe, to obtain the movie titles, and then sort it by decreasing value of JI
+    \item Finally, the results are limited by $numberOfResults$ and then returned 
+\end{enumerate}
+
+\section{Extended Functionality}\label{sec:extended}
+Following the same concept of Section \ref{sec:mandatory}, this section describes the implementation decisions made for the extended functionality which, as said above, have a higher degree of freedom where function naming and parameter choosing is concerned.
+
+\subsection{recommend\_by\_keywords}
+The goal here was to extend the TF-IDF recommendation of movies to one that used, besides the user tags, the individual words inside the movie titles. The parameters are: $(searchTags, movies, min\_fmax=10, numberOfResults=10, debug=False)$
+\begin{enumerate}
+    \itemsep0em
+    \item Split each movie title into tokens and remove punctuation, saving one row per token for each movie (stop words could easily have been removed, but we had no cue on the impact of those on the recommendation results, or on different languages besides english in the dataset)
+    \item For each movie and title word, a negative and unique id was created so that we eneded up with a dataframe of $movieId$, $tag$ (token) a, $userId$ (negative unique id) this was so that previously defined functions could be invoked
+    \item Given the previous point, the remaining actions were simply to join the previous dataset with that of tags, as they have the same columns, and call the $tfidfTags$ (see Section \ref{sec:tfidfTags}) function followed by returning the result of $recommendByTags$ (see Section \ref{sec:recommendByTags}).
+\end{enumerate}
+% Implement a TF-IDF function for word-based movie recommendations that accounts both for user tags and individual words in movie titles. Words in titles can also be informative when looking for movie recomendations!
+\subsection{jiMovieTags}
+% Calculate the Jaccard similarity between tags based on the films they are applied to. Then also implement a function that automatically suggests n tags for a given film m, e.g., the top n similar tags in addition to the tags already associated to the film.
+
+To achieve the goal functionality, two functions were developed: $ji\_similarity\_tags\_movies$ - calculates the Jaccard similarity between tags based on the films they are applied to, and $recommend_tags$ - for a given movie $m$, returns $n$ tags based on their similarity to the tags associated to $m$
+
+\subsubsection{ji\_similarity\_tags\_movies}
+
+\begin{enumerate}
+    \itemsep0em
+    \item On the tags dataframe, for each tag - as column $t1$, collect the set of movies it has been associated with as a column $m1$, in a new dataframe - $df\_t1$
+    \item Duplicate $df\_t1$ with $t1$, $m1$ renamed as $t2$, $m2$, in a new dataframe - $df\_t2$
+    \item Call external function for JI calculation ($jaccard\_index$)
+\end{enumerate}
+
+\subsubsection{recommend\_tags}
+
+\begin{enumerate}
+    \itemsep0em
+    \item Filter the tags dataframe to get the entries for the target movie, i.e. $m$, in a new dataframe - $df\_tags$
+    \item Match $df\_tags$ with the ones on the Jaccard similarity dataframe, i.e. $ji$, by creating two dataframes with matches on the $t1$ and $t2$ columns, and later uniting them
+    \item Order the resulting dataframe by descesding ($JI$,$i$,$u$), limit the results by $n$, i.e. the number of target tags, and return the result
+\end{enumerate}
+
+\subsection{jiUsersBehaviour}
+% Calculate the Jaccard similarity between users based on what films they rate (independently of the value of the rating itself). Then also implement a function that recommends movies to an user based on the tastes of similar users, e.g., to recommend to user u the top-rated film per each of the most n similar users to user u, as long as u has not yet rated or tagged the movies at stake.
+
+To achieve the goal functionality, two functions were developed: $ji_similarity_user_ratings$ - calculates thee Jaccard simmilarity between users based on what films they rate, and $recommend_by_ratings$ - for a given user $u$, returns the top-rated film per each of the most $n$ similar users, as long as $u$ has net yet rated or tagged the movies at stake.
+
+\subsubsection{ji\_similarity\_user\_ratings}
+\begin{enumerate}
+    \itemsep0em
+    \item On the ratings dataframe, for each user - as column $u1$, get the set of its ratings as a column $r1$, in a new dataframe - $df\_u1$
+    \item Duplicate $df_u1$ with $u1$, $r1$ renamed as $u1$, $r2$, in a new dataframe - $df\_u2$
+    \item Call external function for JI calculation ($jaccard\_index$)
+\end{enumerate}
+
+\subsubsection{recommend\_by\_ratings}
+\begin{enumerate}
+    \itemsep0em
+    \item Get the $n$ most similar users to the target user, i.e. $u$, by filtering the Jaccard similarity dataframe, i.e. $ji$, by userId, in a new dataframe - $df\_u$
+    \item Get the ratings made by the 'top n' users by joining $df\_u$ with the ratings dataframe on userId, in a new dataframe - $df\_top\_n\_ratings$
+    \item Get the movies user $u$ has rated or tagged, by filtering the ratings and tags dataframes on userId and unifying the results, in a new dataframe - $df\_u\_rt$
+    \item Get movies from 'top n' users that user $u$ has rated or tagged by joining $df\_top\_n\_ratings$ with $df\_u\_rt$, in a new dataframe - $df\_common$
+    \item Get the eligible movies from the 'top n' users by calculating the difference between $df\_top\_ratings$ and $df\_common$, in a new dataframe - $df\_top\_movies$
+    \item Filter $df\_top\_movies$ by getting the top rated movie for each user, by calculating a dataframe with the $max_rating$ for each user, joining with with $df\_top\_movies$, and removing "duplicate" entries, as we want a movie from each user
+    \item Finally, join the resulting dataframe with the movies dataframe to get the titles, select relevant columns, order by desceding $JI$, and return the result
+\end{enumerate}
+
+
+\section{Conclusions}
+This project has proved invaluable for the group members to understand the theory learned in classes, its challenges and how it can be leveraged to reach real-world applications with big data and cloud computing. In the future, these skills will help the students be more proficient in applying the proper techniques and also fairly more adaptable to the presented challenges. It also proved that the tools used are more than capable of performing the required tasks efficiently and with few development costs. 
+
+On a note for the teachers, the group also felt some inconsistencies associated with the naming of mandatory functions using \textit{camelCase} and the lack of a normative approach for parameter names (which have both \textit{camelCase} and \textit{snake\_case}, these do not follow most Python naming conventions, such as Google Python Style Guide \footnote{https://google.github.io/styleguide/pyguide.html}.
+
+All in all, this was a more work than initially expected, since the teachers already provided us with a structured notebook and very clear instructions but we learned that with time event what seems simple, can be simplified further until a point of perfection, which we have fought for in this project.
+
+\end{document}
