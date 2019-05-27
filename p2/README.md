@@ -23,3 +23,10 @@ Miguel Ramalho,  up201403027
 13. We redid the plots and added some new ones, as specified in the homework specification
 14. We tried using python's [ggplot](http://ggplot.yhathq.com/) to achieve the mean line in the example plot with R's `stat_smooth` but there was some version incompatibilities and we gave up as this is too recent and not yet totally handled (see [this issue](https://github.com/yhat/ggpy/issues/662))
 15. We migrated our DASK dataset to our new VM (24 cores) and ran it with the whole dataset
+
+
+# Prediction Task
+* olhar para 24h atrás, e dada a situação atual, quanto tempo é que ele vai ficar
+* também se pode fazer um clustering de pacientes e medicamentos que tomam
+* em função de caregiver, ver se as pessoas ficam mais ou menos tempo
+
