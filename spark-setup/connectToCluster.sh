@@ -6,6 +6,7 @@ if [ $# -ne 1 ]; then
 fi
 
 name=$1
-gcloud compute ssh "$name-m" -- -L8123:localhost:8123
+gcloud compute ssh "$name" -- -L8123:localhost:8123 -L8080:localhost:8080 -L8888:localhost:8888
+
 
 exit $?
