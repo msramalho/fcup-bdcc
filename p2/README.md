@@ -30,3 +30,12 @@ Miguel Ramalho,  up201403027
 * também se pode fazer um clustering de pacientes e medicamentos que tomam
 * em função de caregiver, ver se as pessoas ficam mais ou menos tempo
 
+## Development Setup
+
+ - Create Compute Engine instance - 24vCPUs, region `europe-west-1`
+ - SSH into VM - `$ ../spark-setup/.connectToCluster <instance-name>`
+ - Install pip3 - `$ sudo apt-get install python3-pip python3-dev`
+ - Install jupyter - `$ sudo pip3 install --prefix /usr/local jupyter`
+ - Run jupyter - `$ juputer notebook` and open the web instance
+ - Upload the `BDCC_p2_dask.ipynb` to Jupyter 
+ - pErFoRM bIg DaTa ChAlLeNgE
