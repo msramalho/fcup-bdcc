@@ -4,7 +4,8 @@ data/
 __pycache__/
 *.py[cod]
 *$py.class
-
+temp.txt
+dask-worker-space/
 # C extensions
 *.so
 
