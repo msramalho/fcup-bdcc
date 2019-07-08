@@ -1,65 +1,45 @@
-# fcup-bdcc
-Big Data &amp; Cloud Computing 
+# Fcup-bdcc
+Big Data & Cloud Computing 
 
-[Project description](https://www.dcc.fc.up.pt/~edrdo/aulas/bdcc/projects/01/)
+## Part 1
+Use [Spark](https://spark.apache.org/) and [Google Cloud Platform](https://cloud.google.com/) to perform analysis on increasing difficulty samples of the [MovieLens](https://grouplens.org/datasets/movielens/) dataset.
 
-## General Info 
-### Deadline
-Apr. 7, 2019
+* [Part 1 folder](p1)
+* [Jupyter Notebook](p1/BDCCp1.iynb)
+* [Report](p1/report)
 
-### Delivery
-Send an email to edrdo@dcc.fc.up.pt with the following attachments:
-- The Jupyter notebook (or the Python export of it, if you prefer);
-- A text document in Portuguese or English summarising the work you could accomplish (in terms of functionality and data sets) and the difficulties you had, with at most 3 pages (excluding the cover page).
-
-### Evaluation
-Your code will be evaluated in terms of:
-
- - correctness in functional terms;
- - good use of Spark primitives, avoiding redundant or too complicated data tranformations;
- - legibility - use comments in your code to explain the steps in your algorithms, and indent the code properly (avoid long lines of code).
- - Your report should be short and succint (3 pages max.), but readable!
-
-The completion of challenges proposed at the end of this document may be worth up to 15 % of the final grade.
-
-## Development 
- - Some expected results which can be used for testing can be found [here](https://www.dcc.fc.up.pt/~edrdo/aulas/bdcc/projects/01/Tests.html)
-### Requirements
-
-- [Google Cloud SDK](https://cloud.google.com/sdk/) - specifically the `gcloud` and `gsutil` utilities
-
-### "Version Control" of the notebook
-
-Make sure you have the latest version of the notebook on your Google Storage bucket
-
-```shell 
-$ gsutil cp BDCCp1.ipynb gs://bdcc_up2015XXXX/notebooks/
+Example of Pyspark use:
+```python
+def recommendByTag(singleTag, TFIDF_tags, movies, min_fmax=10, numberOfResults=10, debug=False):
+    # start by most complexity-reducing operation: filter
+    # filter by the singleTag
+    # remove entries with f_max < min_fmax
+    df_tag = TFIDF_tags.filter(TFIDF_tags.tag == singleTag)\
+                   .filter(TFIDF_tags.f_max >= min_fmax)
+        
+    # join to get movie title
+    # order by descending TFIDF + ascending lexicographic title
+    # remove unnecessary columns
+    # return results limited to numberOfResults
+    df = df_tag.join(movies, 'movieId')\
+                .orderBy(['TF_IDF','title'], ascending=[0,1])\
+                .select('movieId', 'title', 'TF_IDF')\
+                .limit(numberOfResults)
+    return df
 ```
 
-When you're done bigclouding, copy the file back and commit changes
-```shell
-$ gsutil cp gs://bdcc_up2015XXXX/notebooks/BDCCp1.ipynb .
-```
+## Part 2
+Open problem of using Big Data tools and techniques to analyse a 32GB+ dataset of hospital events. Besides GCP, we used [DASK](https://dask.org/) and [dask-ml](https://dask-ml.readthedocs.io/en/latest/).
 
-### Starting the "cluster"
+* [Part 2 folder](p2)
+* [Jupyter Notebook w/ ML task](p2/sample.iynb)
+* [Jupyter Notebook full dataset](p2/full.ipynb)
+* [Report](p2/report)
 
-```shell
-$ cd spark-setup
-$ ./startCluster.sh <clustername> #.e.g, clusterup2015XXXX
-```
+<p align="center"><img src="https://i.imgur.com/kDlW55J.png"/></p>
+<p align="center"><img src="https://i.imgur.com/QhPy7yj.gif"/></p>
 
-### Connecting
 
-```shell
-$ cd spark-setup
-$ ./connectToCluster.sh <vm_name> # e.g., clusterup2015XXXX
-```
-The Jupyter instance _should_ now be running on http://localhost:8123
-
-### Stopping 
-```shell
-$ cd spark-setup
-$ ./stopCluster.sh <vm_name> # e.g., clusterup2015XXXX
-```
-
-**Note**: if any of this fails, check [the Google Cloud Platform Web App](https://console.cloud.google.com/)
+## Authors
+* [António Almeida](https://github.com/antonioalmeida)
+* [Miguel Ramalho](https://github.com/msramalho)
