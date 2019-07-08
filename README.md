@@ -36,7 +36,12 @@ Open problem of using Big Data tools and techniques to analyse a 32GB+ dataset o
 * [Jupyter Notebook full dataset](p2/full.ipynb)
 * [Report](p2/report)
 
+#### Example Plot
+
 <p align="center"><img src="https://i.imgur.com/kDlW55J.png"/></p>
+
+#### Dask-Distributed Dashboard
+
 <p align="center"><img src="https://i.imgur.com/QhPy7yj.gif"/></p>
 
 
